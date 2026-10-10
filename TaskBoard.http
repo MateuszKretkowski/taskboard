@@ -1,0 +1,29 @@
+@api = http://localhost:5080/api/tasks
+@id = 00000000-0000-0000-0000-000000000000
+
+### Lista zadań
+GET {{api}}
+
+### Nowe zadanie
+POST {{api}}
+Content-Type: application/json
+
+{ "title": "Kupić mleko" }
+
+### Jedno zadanie (wklej id do zmiennej @id na górze)
+GET {{api}}/{{id}}
+
+### Zmiana tytułu
+PUT {{api}}/{{id}}/title
+Content-Type: application/json
+
+{ "title": "Kupić 2 mleka" }
+
+### Rozpocznij
+POST {{api}}/{{id}}/start
+
+### Ukończ
+POST {{api}}/{{id}}/complete
+
+### Usuń
+DELETE {{api}}/{{id}}

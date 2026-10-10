@@ -1,11 +1,15 @@
 using System.Text.Json.Serialization;
 using TaskBoard.Api.Domain;
+using TaskBoard.Api.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
+
+app.UseMiddleware<RequestTimingMiddleware>();
+app.UseMiddleware<MaintenanceMiddleware>();
 
 var tasks = new List<TaskItem>();
 
@@ -91,6 +95,18 @@ app.MapDelete("/{id:guid}", (Guid id) =>
     tasks.Remove(task);
     return Results.NoContent();
 });
+
+app.MapGet("/", (TaskItemStatus? status) =>
+{
+    if (Enum.IsDefined(status.Value)) 
+    {
+        return Results.BadRequest("Nieznany status.");
+    }
+    var res = tasks.Where(p => p.Status == status).ToList();
+    return res.Count() == 0 ? Results.Ok(tasks) : Results.Ok(res);
+});
+
+
 
 app.Run();
 

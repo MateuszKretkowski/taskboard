@@ -26,3 +26,4 @@
 /Users/mateuszkretkowski/Projects/TaskBoard/TaskBoard.api/obj/Debug/net10.0/TaskBoard.api.pdb
 /Users/mateuszkretkowski/Projects/TaskBoard/TaskBoard.api/obj/Debug/net10.0/TaskBoard.api.genruntimeconfig.cache
 /Users/mateuszkretkowski/Projects/TaskBoard/TaskBoard.api/obj/Debug/net10.0/ref/TaskBoard.api.dll
+/Users/mateuszkretkowski/Projects/TaskBoard/TaskBoard.api/obj/Debug/net10.0/TaskBoard.api.sourcelink.json
