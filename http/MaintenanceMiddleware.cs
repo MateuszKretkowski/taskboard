@@ -2,7 +2,7 @@ namespace TaskBoard.Api.Http;
 
 public class MaintenanceMiddleware
 {
-    public RequestDelegate _next;
+    private readonly RequestDelegate _next;
     bool isMaintenance;
 
     public MaintenanceMiddleware(RequestDelegate next)
