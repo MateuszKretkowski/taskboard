@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace TaskBoard.Api.Controllers;
 
 [ApiController]
-[Route("/api/tasks")]
+[Route("api/tasks")]
 public class TasksController : ControllerBase
 {
     // temp
@@ -46,7 +46,7 @@ public class TasksController : ControllerBase
         {
             return NotFound();
         }
-        task.Title = request.Title;
+        task.Title = request.Title.Trim();
         return Ok(TaskResponse.From(task));
     }
 
@@ -65,7 +65,7 @@ public class TasksController : ControllerBase
     [HttpPut("{id:guid}/complete")]
     public ActionResult<TaskResponse> Complete(Guid id)
     {
-        TaskItem task = Find(id);
+        TaskItem? task = Find(id);
         if (task is null)
         {
             return NotFound();
@@ -78,12 +78,12 @@ public class TasksController : ControllerBase
     [HttpPut("{id:guid}/reopen")]
     public ActionResult<TaskResponse> Reopen(Guid id)
     {
-        TaskItem task = Find(id);
+        TaskItem? task = Find(id);
         if (task is null)
         {
             return NotFound();
         }
-        task.Status = TaskItemStatus.InProgress;
+        task.Status = TaskItemStatus.Todo;
         task.CompletedAt = null;
         return Ok(TaskResponse.From(task));
     }
@@ -91,7 +91,7 @@ public class TasksController : ControllerBase
     [HttpDelete("{id:guid}")]
     public IActionResult Delete(Guid id)
     {
-        TaskItem task = Find(id);
+        TaskItem? task = Find(id);
         if (task is null)
         {
             return NotFound();
@@ -105,7 +105,7 @@ public class TasksController : ControllerBase
         return tasks.FirstOrDefault(t => t.Id == id);
     }
 
-    private ActionResult<TaskResponse> ToResponse(TaskItem task)
+    private ActionResult<TaskResponse> ToResponse(TaskItem? task)
     {
         if (task is null)
         {
