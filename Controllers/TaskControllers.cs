@@ -12,8 +12,12 @@ public class TasksController : ControllerBase
     public static readonly List<TaskItem> tasks = [];
 
     [HttpGet]
-    public IReadOnlyList<TaskResponse> GetAll()
+    public IReadOnlyList<TaskResponse> GetAll([FromQuery] TaskItemStatus? status)
     {
+        if (status != null)
+        {
+            return tasks.Where(t => t.Status == status).Select(t => TaskResponse.From(t)).ToList();
+        }
         return tasks.Select(t => TaskResponse.From(t)).ToList();
     }
 
