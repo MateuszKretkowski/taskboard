@@ -65,7 +65,7 @@ public class TaskItem
         string trimmed = title.Trim();
         if (trimmed.Length > MaxTitleLength)
         {
-            throw new ArgumentException($"Tytul jest za dlugi. Max znakow: {MaxTitleLength}", nameof(title));
+            throw new ArgumentException($"Tytul tasku jest za dlugi. Max znakow: {MaxTitleLength}", nameof(title));
         }
         return trimmed;
     }
