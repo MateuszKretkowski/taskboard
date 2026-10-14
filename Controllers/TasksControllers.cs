@@ -1,0 +1,84 @@
+using TaskBoard.Api.Domain;
+using TaskBoard.Api.Contracts;
+using Microsoft.AspNetCore.Mvc;
+using TaskBoard.Api.Services;
+
+namespace TaskBoard.Api.Controllers;
+
+[ApiController]
+[Route("api/tasks")]
+public class TasksController : ControllerBase
+{
+    private readonly TaskService _service;
+
+    public TasksController(TaskService service)
+    {
+        this._service = service;
+    }
+
+    [HttpGet]
+    public async Task<IReadOnlyList<TaskResponse>> GetAll()
+    {
+        var tasks = await _service.GetAllAsync();
+        return tasks.Select(TaskResponse.From).ToList();
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<TaskResponse>> GetById(Guid id)
+    {
+        var task = await _service.GetByIdAsync(id);
+        return Ok(ToResponse(task));
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request)
+    {
+        var task = await _service.CreateAsync(request.Title);
+        return CreatedAtAction(nameof(GetById), new { id = task.Id }, TaskResponse.From(task));
+    }
+
+    [HttpPut("{id:guid}/title")]
+    public async Task<ActionResult<TaskResponse>> Rename(Guid id, RenameTaskRequest request)
+    {
+        var task = await _service.RenameAsync(id, request.Title);
+        return ToResponse(task);
+    }
+
+    [HttpPut("{id:guid}/start")]
+    public async Task<ActionResult<TaskResponse>> Start(Guid id)
+    {
+        var task = await _service.StartAsync(id);
+        return ToResponse(task);
+    }
+
+    [HttpPut("{id:guid}/complete")]
+    public async Task<ActionResult<TaskResponse>> Complete(Guid id)
+    {
+        var task = await _service.CompleteAsync(id);
+        return ToResponse(task);
+    }
+
+    [HttpPut("{id:guid}/reopen")]
+    public async Task<ActionResult<TaskResponse>> Reopen(Guid id)
+    {
+        var task = await _service.ReopenAsync(id);
+        return ToResponse(task);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        bool deleted = await _service.DeleteAsync(id);
+        return deleted ? NoContent() : NotFound();
+    }
+
+    private ActionResult<TaskResponse> ToResponse(TaskItem? task)
+    {
+        if (task is null)
+        {
+            return NotFound();
+        }
+
+        return TaskResponse.From(task);
+    }
+}
