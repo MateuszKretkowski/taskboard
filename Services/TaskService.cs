@@ -19,36 +19,22 @@ public class TaskService
 
     public async Task<TaskItem> CreateAsync(string title)
     {
-        TaskItem task = new TaskItem
-        {
-            Id = Guid.CreateVersion7(),
-            Title = title.Trim(),
-            Status = TaskItemStatus.Todo,
-            CreatedAt = _clock.UtcNow
-        };
+        TaskItem task = new TaskItem(title, _clock.UtcNow);
         await _repository.AddTaskAsync(task);
         return task;
     }
 
     public Task<TaskItem?> RenameAsync(Guid id, string title) => 
-        ModifyAsync(id, task => task.Title = title.Trim());
+        ModifyAsync(id, task => task.Rename(title));
 
     public Task<TaskItem?> StartAsync(Guid id) => 
-        ModifyAsync(id, task => task.Status = TaskItemStatus.InProgress);
+        ModifyAsync(id, task => task.Start());
 
     public Task<TaskItem?> CompleteAsync(Guid id) => 
-        ModifyAsync(id, task =>
-        {
-            task.Status = TaskItemStatus.Done;
-            task.CompletedAt = _clock.UtcNow;
-        });
+        ModifyAsync(id, task => task.Complete(_clock.UtcNow));
 
     public Task<TaskItem?> ReopenAsync(Guid id) => 
-        ModifyAsync(id, task =>
-        {
-            task.Status = TaskItemStatus.Todo;
-            task.CompletedAt = null;
-        });
+        ModifyAsync(id, task => task.Reopen());
     
     public async Task<bool> DeleteAsync(Guid id)
     {
