@@ -27,7 +27,7 @@ public class TaskItem
     {
         if (Status != TaskItemStatus.Todo)
         {
-            throw new InvalidOperationException($"Nie mozna rozpoczac zadania w stanie: {Status}.");
+            throw new DomainConflictException($"Nie mozna rozpoczac zadania w stanie: {Status}.");
         }
         this.Status = TaskItemStatus.InProgress;
     }
@@ -36,7 +36,7 @@ public class TaskItem
     {
         if (Status != TaskItemStatus.InProgress)
         {
-            throw new InvalidOperationException($"Nie mozna zakonczyc zadania w stanie: {Status}");
+            throw new DomainConflictException($"Nie mozna zakonczyc zadania w stanie: {Status}");
         }
         if (completedAt < CreatedAt)
         {
@@ -50,7 +50,7 @@ public class TaskItem
     {
         if (Status != TaskItemStatus.Done)
         {
-            throw new InvalidOperationException($"Nie mozna ponownie otworzyc taska w stanie: {Status}");
+            throw new DomainConflictException($"Nie mozna ponownie otworzyc taska w stanie: {Status}");
         }
         this.Status = TaskItemStatus.InProgress;
         this.CompletedAt = null;
@@ -60,12 +60,12 @@ public class TaskItem
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            throw new ArgumentException("Tytul tasku nie moze byc pusty.", nameof(title));
+            throw new DomainValidationException("Tytul tasku nie moze byc pusty.");
         }
         string trimmed = title.Trim();
         if (trimmed.Length > MaxTitleLength)
         {
-            throw new ArgumentException($"Tytul tasku jest za dlugi. Max znakow: {MaxTitleLength}", nameof(title));
+            throw new DomainValidationException($"Tytul tasku jest za dlugi. Max znakow: {MaxTitleLength}");
         }
         return trimmed;
     }

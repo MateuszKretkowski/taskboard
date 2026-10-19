@@ -6,11 +6,13 @@ public class TaskService
 {
     private readonly ITaskRepository _repository;
     private readonly IClock _clock;
+    private readonly ILogger<TaskService> _logger;
 
-    public TaskService(ITaskRepository repository, IClock clock)
+    public TaskService(ITaskRepository repository, IClock clock, ILogger<TaskService> logger)
     {
         this._repository = repository;
         this._clock = clock;
+        this._logger = logger;
     }
 
     public Task<IReadOnlyList<TaskItem>> GetAllAsync() => _repository.GetAllAsync();
@@ -21,6 +23,7 @@ public class TaskService
     {
         TaskItem task = new TaskItem(title, _clock.UtcNow);
         await _repository.AddTaskAsync(task);
+        _logger.LogInformation("Utworzono zadanie: {TaskId}", task.Id);
         return task;
     }
 
@@ -44,6 +47,7 @@ public class TaskService
             return false;
         }
         await _repository.RemoveAsync(task);
+        _logger.LogInformation("Usunieto zadanie: {TaskId}", task.Id);
         return true;
     }
 
@@ -56,6 +60,7 @@ public class TaskService
         }
 
         change(task);
+
         return task;
     }
 }
