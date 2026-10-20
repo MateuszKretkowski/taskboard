@@ -10,12 +10,12 @@ public class TaskItem
     public DateTime CreatedAt {get; private set;}
     public DateTime? CompletedAt {get; private set;}
 
-    public TaskItem(string title, DateTime dateTime)
+    public TaskItem(string title, DateTime createdAt)
     {
         this.Id = Guid.CreateVersion7();
         this.Title = NormalizeTitle(title);
         this.Status = TaskItemStatus.Todo;
-        this.CreatedAt = dateTime;
+        this.CreatedAt = createdAt;
     }
 
     public void Rename(string newTitle)

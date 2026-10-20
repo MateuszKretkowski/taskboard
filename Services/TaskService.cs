@@ -23,6 +23,7 @@ public class TaskService
     {
         TaskItem task = new TaskItem(title, _clock.UtcNow);
         await _repository.AddTaskAsync(task);
+        await _repository.SaveChangesAsync();
         _logger.LogInformation("Utworzono zadanie: {TaskId}", task.Id);
         return task;
     }
@@ -47,6 +48,7 @@ public class TaskService
             return false;
         }
         await _repository.RemoveAsync(task);
+        await _repository.SaveChangesAsync();
         _logger.LogInformation("Usunieto zadanie: {TaskId}", task.Id);
         return true;
     }
@@ -60,6 +62,8 @@ public class TaskService
         }
 
         change(task);
+
+        await _repository.SaveChangesAsync();
 
         return task;
     }
