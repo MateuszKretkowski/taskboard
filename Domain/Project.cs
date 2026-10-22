@@ -7,20 +7,18 @@ public class Project
     public Guid Id {get; private set;}
     public string Name {get; private set;}
     public bool IsArchived {get; private set;}
+    public DateTime CreatedAt {get; private set;}
 
-    public Project(string title)
+    public Project(string title, DateTime createdAt)
     {
         this.Id = Guid.CreateVersion7();
         this.Name = NormalizeTitle(title);
-        this.IsArchived = false;
+        this.CreatedAt = createdAt;
     }
 
     public void Rename(string newTitle)
     {
-        if (IsArchived)
-        {
-            throw new InvalidOperationException("Nie mozna zmienic tytulu zarchiwizowanemu projektowi.");
-        }
+        EnsureNotArchived("Nie mozna zmienic tytulu zarchiwizowanemu projektowi.");
         this.Name = NormalizeTitle(newTitle);
     }
 
@@ -28,7 +26,7 @@ public class Project
     {
         if (this.IsArchived)
         {
-            throw new InvalidOperationException("Nie mozna zarchiwizowac zarchiwizowanego projektu");
+            throw new DomainConflictException("Nie mozna zarchiwizowac zarchiwizowanego projektu");
         }
         this.IsArchived = true;
     }
@@ -37,21 +35,36 @@ public class Project
     {
         if (!this.IsArchived)
         {
-            throw new InvalidOperationException("Nie mozna zodzarchiwizowac zodzarchiwizowanego projektu");
+            throw new DomainConflictException("Nie mozna zodzarchiwizowac zodzarchiwizowanego projektu");
         }
         this.IsArchived = true;
+    }
+
+    public TaskItem CreateTask(string title, DateTime createdAt)
+    {
+        EnsureNotArchived("Nie mozna dodac zadania do zarchiwizowanego projektu.");
+        TaskItem task = new TaskItem(title, Id, createdAt);
+        return task;
+    }
+
+    public void EnsureNotArchived(string message)
+    {
+        if (IsArchived)
+        {
+            throw new DomainConflictException(message);
+        }
     }
 
     public static string NormalizeTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            throw new ArgumentException("Tytul projektu nie moze byc pusty.", nameof(title));
+            throw new DomainConflictException("Tytul projektu nie moze byc pusty.");
         }
         var trimmed = title.Trim();
         if (trimmed.Length > MaxNameLength)
         {
-            throw new ArgumentException($"Tytul projektu nie moze byc wiekszy niz: {MaxNameLength}");
+            throw new DomainValidationException($"Tytul projektu nie moze byc wiekszy niz: {MaxNameLength}");
         }
         return trimmed;
     }

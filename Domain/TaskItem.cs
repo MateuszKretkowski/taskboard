@@ -9,13 +9,15 @@ public class TaskItem
     public TaskItemStatus Status {get; private set;}
     public DateTime CreatedAt {get; private set;}
     public DateTime? CompletedAt {get; private set;}
+    public Guid ProjectId {get; private set;}
 
-    public TaskItem(string title, DateTime createdAt)
+    internal TaskItem(string title, Guid projectId, DateTime createdAt)
     {
         this.Id = Guid.CreateVersion7();
         this.Title = NormalizeTitle(title);
         this.Status = TaskItemStatus.Todo;
         this.CreatedAt = createdAt;
+        this.ProjectId = projectId;
     }
 
     public void Rename(string newTitle)
