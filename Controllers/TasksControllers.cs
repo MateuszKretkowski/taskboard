@@ -16,25 +16,11 @@ public class TasksController : ControllerBase
         this._service = service;
     }
 
-    [HttpGet]
-    public async Task<IReadOnlyList<TaskResponse>> GetAll()
-    {
-        var tasks = await _service.GetAllAsync();
-        return tasks.Select(TaskResponse.From).ToList();
-    }
-
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<TaskResponse>> GetById(Guid id)
     {
         var task = await _service.GetByIdAsync(id);
-        return Ok(ToResponse(task));
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<TaskResponse>> Create(CreateTaskRequest request)
-    {
-        var task = await _service.CreateAsync(request.Title);
-        return CreatedAtAction(nameof(GetById), new { id = task.Id }, TaskResponse.From(task));
+        return ToResponse(task);
     }
 
     [HttpPut("{id:guid}/title")]

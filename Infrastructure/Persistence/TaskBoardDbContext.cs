@@ -58,9 +58,9 @@ public class TaskBoardDbContext : DbContext
 
         try
         {
-            return await base.SaveChangesAsync();
+            return await base.SaveChangesAsync(cancellationToken);
         }
-        catch (DBConcurrencyException ex)
+        catch (DbUpdateConcurrencyException ex)
         {
             throw new ConcurrencyConflictException("Dane zostaly w miedzyczasie zmienione przez kogos innego. Sproboj ponownie.", ex);
         }

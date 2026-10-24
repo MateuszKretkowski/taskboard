@@ -6,7 +6,7 @@ public interface IProjectRepository
 {
     Task AddAsync(Project project);
     Task<Project?> GetByIdAsync(Guid id);
-    Task<IReadOnlyList<Project>> GetSummariesAsync();
+    Task<IReadOnlyList<ProjectSummary>> GetSummariesAsync();
     Task RemoveAsync(Project project);
     Task SaveChangesAsync();
 }

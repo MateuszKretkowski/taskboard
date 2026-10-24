@@ -2,17 +2,17 @@ namespace TaskBoard.Api.Domain;
 
 public class Project
 {
-    public static int MaxNameLength;
+    public const int MaxNameLength = 100;
 
     public Guid Id {get; private set;}
     public string Name {get; private set;}
     public bool IsArchived {get; private set;}
     public DateTime CreatedAt {get; private set;}
 
-    public Project(string title, DateTime createdAt)
+    public Project(string name, DateTime createdAt)
     {
         this.Id = Guid.CreateVersion7();
-        this.Name = NormalizeTitle(title);
+        this.Name = NormalizeTitle(name);
         this.CreatedAt = createdAt;
     }
 
@@ -47,7 +47,7 @@ public class Project
         return task;
     }
 
-    public void EnsureNotArchived(string message)
+    private void EnsureNotArchived(string message)
     {
         if (IsArchived)
         {
@@ -55,11 +55,11 @@ public class Project
         }
     }
 
-    public static string NormalizeTitle(string title)
+    private static string NormalizeTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            throw new DomainConflictException("Tytul projektu nie moze byc pusty.");
+            throw new DomainValidationException("Tytul projektu nie moze byc pusty.");
         }
         var trimmed = title.Trim();
         if (trimmed.Length > MaxNameLength)

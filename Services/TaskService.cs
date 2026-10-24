@@ -20,7 +20,7 @@ public class TaskService
 
     public Task<TaskItem?> GetByIdAsync(Guid id) => _repository.GetByIdAsync(id);
 
-    public async Task<PagedResult<TaskItem>> SearchAsync(Guid projectId, TaskItemStatus status?, int page, int pageSize)
+    public async Task<PagedResult<TaskItem>?> SearchAsync(Guid projectId, TaskItemStatus? status, int page, int pageSize)
     {
         var project = await _projects.GetByIdAsync(projectId);
         if (project is null)
@@ -30,7 +30,7 @@ public class TaskService
         return await _repository.SearchAsync(projectId, status, page, pageSize);
     }
 
-    public async Task<TaskItem> CreateAsync(Guid projectId, string title)
+    public async Task<TaskItem?> CreateAsync(Guid projectId, string title)
     {
         var project = await _projects.GetByIdAsync(projectId);
         if (project is null)

@@ -15,7 +15,7 @@ public class ProjectService
         this._logger = logger;
     }
 
-    public Task<IReadOnlyList<Project>> GetSummariesAsync() => _projects.GetSummariesAsync();
+    public Task<IReadOnlyList<ProjectSummary>> GetSummariesAsync() => _projects.GetSummariesAsync();
     
     public Task<Project?> GetByIdAsync(Guid id) => _projects.GetByIdAsync(id);
 
