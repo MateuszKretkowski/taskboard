@@ -13,16 +13,29 @@ public class TaskBoardDbContext : DbContext
         
     }
 
+    public DbSet<User> Users => Set<User>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+        configurationBuilder.Properties<string>().HaveConversion<Email>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<User>(user =>
+        {
+            user.ToTable("users");
+            user.HasKey(u => u.Id);
+            user.Property(u => u.Email).HasConversion(new StringEmailConverter()).HasMaxLength(Email.MaxValueLength).IsRequired();
+            user.HasIndex(u => u.Email).IsUnique();
+            user.Property(u => u.CreatedAt);
+            user.Property(u => u.PasswordHash).IsRequired();
+            user.Property<Guid>(VersionProperty).IsConcurrencyToken();
+        });
+
         modelBuilder.Entity<Project>(project =>
         {
             project.ToTable("projects");

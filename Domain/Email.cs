@@ -8,22 +8,45 @@ public record Email
 
     public Email(string value)
     {
+        string? error = Validate(value, out string normalized);
+        if (error is not null)
+        {
+            throw new DomainValidationException(error);
+        }
+
+        Value = normalized;
+    }
+
+    public static bool TryParse(string? value, out Email? email)
+    {
+        if (Validate(value, out _) is not null)
+        {
+            email = null;
+            return false;
+        }
+
+        email = new Email(value!);
+        return true;
+    }
+
+    private static string? Validate(string? value, out string normalized)
+    {
+        normalized = "";
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("Email nie moze byc pusty.", nameof(value));
+            return "Email nie moze byc pusty.";
         }
-        var normalized = value.Trim().ToLowerInvariant();
+        normalized = value.Trim().ToLowerInvariant();
         if (normalized.Length > MaxValueLength)
         {
-            throw new ArgumentException($"Email nie moze byc dluzszy niz: {MaxValueLength}", nameof(value));
+            return $"Email nie moze byc dluzszy niz: {MaxValueLength}.";
         }
         int indexOfAt = normalized.IndexOf("@");
         bool isProper = indexOfAt >= 0 && indexOfAt == normalized.LastIndexOf("@");
         if (!isProper || indexOfAt == 0 || indexOfAt == normalized.Length - 1)
         {
-            throw new ArgumentException("Email musi miec @", nameof(value));
+            return "Email musi miec @";
         }
-
-        Value = normalized;
+        return null;
     }
 }
