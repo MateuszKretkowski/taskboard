@@ -20,7 +20,6 @@ public class TaskBoardDbContext : DbContext
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
-        configurationBuilder.Properties<string>().HaveConversion<Email>();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

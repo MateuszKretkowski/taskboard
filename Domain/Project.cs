@@ -9,10 +9,10 @@ public class Project
     public bool IsArchived {get; private set;}
     public DateTime CreatedAt {get; private set;}
 
-    public Project(string name, DateTime createdAt)
+    public Project(string Name, DateTime createdAt)
     {
         this.Id = Guid.CreateVersion7();
-        this.Name = NormalizeTitle(name);
+        this.Name = NormalizeTitle(Name);
         this.CreatedAt = createdAt;
     }
 
