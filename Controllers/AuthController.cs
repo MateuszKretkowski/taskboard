@@ -22,6 +22,13 @@ public class AuthController : ControllerBase
         this._service = service;
     }
 
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
+    {
+        await _service.ChangePasswordAsync(User.GetUserId(), request.currentPassword, request.newPassword);
+        return NoContent();
+    }
+
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<CurrentUserResponse>> Register(RegisterUserRequest request)

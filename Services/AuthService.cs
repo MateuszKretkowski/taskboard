@@ -20,6 +20,28 @@ public class AuthService
         this._hasher = hasher;
     }
     
+    public async Task ChangePasswordAsync(Guid id, string password, string newPassword)
+    {
+        User? user = await GetByIdAsync(id);
+        if (user is null)
+        {
+            throw new DomainConflictException("User nie jest zalogowany.");
+        }
+
+        if (!_hasher.Verify(user.PasswordHash, password))
+        {
+            throw new DomainValidationException("Hasla sie nie zgadzaja");
+        }
+        if (newPassword.Length < MinPasswordLength || newPassword.Length > MaxPasswordLength)
+        {
+            throw new DomainValidationException(
+                $"Hasło musi mieć od {MinPasswordLength} do {MaxPasswordLength} znaków.");
+        }
+        user.ChangePasswordHash(_hasher.Hash(newPassword));
+        await _users.SaveChangesAsync();
+        _logger.LogInformation("Zmieniono haslo uzytkownika {userId}", user.Id);
+    }
+
     public async Task<User> RegisterAsync(string email, string password)
     {
         Email address = new Email(email);
