@@ -4,17 +4,21 @@ public class Project
 {
     public const int MaxNameLength = 100;
 
+    public Guid OwnerId {get; private set;}
     public Guid Id {get; private set;}
     public string Name {get; private set;}
     public bool IsArchived {get; private set;}
     public DateTime CreatedAt {get; private set;}
 
-    public Project(string Name, DateTime createdAt)
+    public Project(Guid ownerId, string Name, DateTime createdAt)
     {
+        this.OwnerId = ownerId;
         this.Id = Guid.CreateVersion7();
         this.Name = NormalizeTitle(Name);
         this.CreatedAt = createdAt;
     }
+
+    public bool IsOwnedBy(Guid ownerId) => this.OwnerId == ownerId;
 
     public void Rename(string newTitle)
     {

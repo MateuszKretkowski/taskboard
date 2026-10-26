@@ -34,11 +34,16 @@ namespace TaskBoard.api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("Version")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId", "CreatedAt");
 
                     b.ToTable("projects", (string)null);
                 });
@@ -107,6 +112,15 @@ namespace TaskBoard.api.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("TaskBoard.Api.Domain.Project", b =>
+                {
+                    b.HasOne("TaskBoard.Api.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TaskBoard.Api.Domain.TaskItem", b =>

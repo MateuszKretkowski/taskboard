@@ -26,9 +26,9 @@ public class EfProjectRepository : IProjectRepository
         return await project;
     }
 
-    public async Task<IReadOnlyList<ProjectSummary>> GetSummariesAsync()
+    public async Task<IReadOnlyList<ProjectSummary>> GetSummariesAsync(Guid ownerId)
     {
-        return await _db.Projects.OrderBy(p => p.CreatedAt).Select(p => new ProjectSummary(p.Id, p.Name, p.IsArchived, _db.Tasks.Where(t => t.ProjectId == p.Id && t.Status != TaskItemStatus.Done).Count(), _db.Tasks.Where(t => t.ProjectId == p.Id && t.Status == TaskItemStatus.Done).Count())).ToListAsync();
+        return await _db.Projects.Where(p => p.OwnerId == ownerId).OrderBy(p => p.CreatedAt).Select(p => new ProjectSummary(p.Id, p.Name, p.IsArchived, _db.Tasks.Where(t => t.ProjectId == p.Id && t.Status != TaskItemStatus.Done).Count(), _db.Tasks.Where(t => t.ProjectId == p.Id && t.Status == TaskItemStatus.Done).Count())).ToListAsync();
     }
 
     public Task RemoveAsync(Project project)

@@ -18,11 +18,11 @@ public class TaskService
         this._projects = projects;
     }
 
-    public Task<TaskItem?> GetByIdAsync(Guid id) => _repository.GetByIdAsync(id);
+    public Task<TaskItem?> GetByIdAsync(Guid userId, Guid id) => GetOwnedAsync(userId, id);
 
-    public async Task<PagedResult<TaskItem>?> SearchAsync(Guid projectId, TaskItemStatus? status, int page, int pageSize)
+    public async Task<PagedResult<TaskItem>?> SearchAsync(Guid userId, Guid projectId, TaskItemStatus? status, int page, int pageSize)
     {
-        var project = await _projects.GetByIdAsync(projectId);
+        var project = await GetOwnedProjectAsync(userId, projectId);
         if (project is null)
         {
             return null;
@@ -30,10 +30,10 @@ public class TaskService
         return await _repository.SearchAsync(projectId, status, page, pageSize);
     }
 
-    public async Task<TaskItem?> CreateAsync(Guid projectId, string title)
+    public async Task<TaskItem?> CreateAsync(Guid userId, Guid projectId, string title)
     {
-        var project = await _projects.GetByIdAsync(projectId);
-        if (project is null)
+        var project = await GetOwnedProjectAsync(userId, projectId);
+        if (project is null || !project.IsOwnedBy(userId))
         {
             return null;
         }
@@ -44,21 +44,21 @@ public class TaskService
         return task;
     }
 
-    public Task<TaskItem?> RenameAsync(Guid id, string title) => 
-        ModifyAsync(id, task => task.Rename(title));
+    public Task<TaskItem?> RenameAsync(Guid userId, Guid id, string title) => 
+        ModifyAsync(userId, id, task => task.Rename(title));
 
-    public Task<TaskItem?> StartAsync(Guid id) => 
-        ModifyAsync(id, task => task.Start());
+    public Task<TaskItem?> StartAsync(Guid userId, Guid id) => 
+        ModifyAsync(userId, id, task => task.Start());
 
-    public Task<TaskItem?> CompleteAsync(Guid id) => 
-        ModifyAsync(id, task => task.Complete(_clock.UtcNow));
+    public Task<TaskItem?> CompleteAsync(Guid userId, Guid id) => 
+        ModifyAsync(userId, id, task => task.Complete(_clock.UtcNow));
 
-    public Task<TaskItem?> ReopenAsync(Guid id) => 
-        ModifyAsync(id, task => task.Reopen());
+    public Task<TaskItem?> ReopenAsync(Guid userId, Guid id) => 
+        ModifyAsync(userId, id, task => task.Reopen());
     
-    public async Task<bool> DeleteAsync(Guid id)
+    public async Task<bool> DeleteAsync(Guid userId, Guid id)
     {
-        var task = await _repository.GetByIdAsync(id);
+        var task = await GetOwnedAsync(userId, id);
         if (task is null)
         {
             return false;
@@ -69,9 +69,9 @@ public class TaskService
         return true;
     }
 
-    private async Task<TaskItem?> ModifyAsync(Guid id, Action<TaskItem> change)
+    private async Task<TaskItem?> ModifyAsync(Guid userId, Guid id, Action<TaskItem> change)
     {
-        var task = await _repository.GetByIdAsync(id);
+        var task = await GetOwnedAsync(userId, id);
         if (task is null)
         {
             return null;
@@ -82,5 +82,26 @@ public class TaskService
         await _repository.SaveChangesAsync();
 
         return task;
+    }
+
+    private async Task<Project?> GetOwnedProjectAsync(Guid userId, Guid id)
+    {
+        Project? project = await _projects.GetByIdAsync(id);
+        if (project is null || project.IsOwnedBy(userId))
+        {
+            return null;
+        }
+        return project;
+    }
+
+    private async Task<TaskItem?> GetOwnedAsync(Guid userId, Guid id)
+    {
+        TaskItem? task = await _repository.GetByIdAsync(id);
+        if (task is null)
+        {
+            return null;
+        }
+        var project = await GetOwnedProjectAsync(userId, task.ProjectId);
+        return project is null ? null : task;
     }
 }

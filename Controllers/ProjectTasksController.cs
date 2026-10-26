@@ -3,6 +3,7 @@ namespace TaskBoard.Api.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoard.Api.Contracts;
 using TaskBoard.Api.Domain;
+using TaskBoard.Api.Http;
 using TaskBoard.Api.Services;
 
 [Controller]
@@ -19,7 +20,7 @@ public class ProjectTasksController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<PagedResponse<TaskResponse>?>> Search(Guid id, [FromQuery] TaskListQuery query)
     {
-        PagedResult<TaskItem>? pagedResult = await _service.SearchAsync(id, query.status, query.page, query.pageSize);
+        PagedResult<TaskItem>? pagedResult = await _service.SearchAsync(User.GetUserId(), id, query.status, query.page, query.pageSize);
         if (pagedResult is null)
         {
             return NotFound();
@@ -30,7 +31,7 @@ public class ProjectTasksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TaskResponse>> Create(Guid id, [FromQuery] CreateProjectRequest request)
     {
-        var task = await _service.CreateAsync(id, request.name);
+        var task = await _service.CreateAsync(User.GetUserId(), id, request.name);
         if (task is null)
         {
             return NotFound();

@@ -38,9 +38,12 @@ public class TaskBoardDbContext : DbContext
         modelBuilder.Entity<Project>(project =>
         {
             project.ToTable("projects");
+            project.HasOne<User>().WithMany().HasForeignKey(p => p.OwnerId).OnDelete(DeleteBehavior.Cascade);
             project.HasKey(p => p.Id);
             project.Property(p => p.Name).HasMaxLength(Project.MaxNameLength).IsRequired();
             project.Property<Guid>(VersionProperty).IsConcurrencyToken();
+
+            project.HasIndex(p => new { p.OwnerId, p.CreatedAt });
         });
 
         modelBuilder.Entity<TaskItem>(task =>

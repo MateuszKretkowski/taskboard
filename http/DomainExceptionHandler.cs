@@ -24,7 +24,7 @@ public class DomainExceptionHandler : IExceptionHandler
 
         int status = domainException is DomainConflictException ? StatusCodes.Status409Conflict : StatusCodes.Status400BadRequest;
 
-        _logger.LogInformation("Odrzucono zadanie {method} {path}: {reason} ");
+        _logger.LogInformation("Odrzucono zadanie {method} {path}: {reason} ", httpContext.Request.Method, httpContext.Request.Path, domainException.Message);
 
         httpContext.Response.StatusCode = status;
         return await _problemDetails.TryWriteAsync(new ProblemDetailsContext
