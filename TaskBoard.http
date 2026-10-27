@@ -1,29 +1,57 @@
-@api = http://localhost:5080/api/tasks
-@id = 00000000-0000-0000-0000-000000000000
+@api = http://localhost:5080/api
+@projectId = 00000000-0000-0000-0000-000000000000
+@taskId = 00000000-0000-0000-0000-000000000000
 
-### Lista zadań
-GET {{api}}
+### Rejestracja (loguje od razu)
+POST {{api}}/auth/register
+Content-Type: application/json
 
-### Nowe zadanie
-POST {{api}}
+{ "email": "ola@example.com", "password": "bardzo-tajne-1" }
+
+### Logowanie
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "ola@example.com", "password": "bardzo-tajne-1" }
+
+### Kim jestem
+GET {{api}}/auth/me
+
+### Moje projekty z licznikami
+GET {{api}}/projects
+
+### Nowy projekt
+POST {{api}}/projects
+Content-Type: application/json
+
+{ "name": "Dom" }
+
+### Zadania projektu (filtr + strona)
+GET {{api}}/projects/{{projectId}}/tasks?status=Todo&page=1&pageSize=20
+
+### Nowe zadanie w projekcie
+POST {{api}}/projects/{{projectId}}/tasks
 Content-Type: application/json
 
 { "title": "Kupić mleko" }
 
-### Jedno zadanie (wklej id do zmiennej @id na górze)
-GET {{api}}/{{id}}
+### Rozpocznij / ukończ / wznów
+POST {{api}}/tasks/{{taskId}}/start
 
-### Zmiana tytułu
-PUT {{api}}/{{id}}/title
+###
+POST {{api}}/tasks/{{taskId}}/complete
+
+###
+POST {{api}}/tasks/{{taskId}}/reopen
+
+### Zmień tytuł
+PUT {{api}}/tasks/{{taskId}}/title
 Content-Type: application/json
 
 { "title": "Kupić 2 mleka" }
 
-### Rozpocznij
-POST {{api}}/{{id}}/start
+### Archiwizuj projekt
+POST {{api}}/projects/{{projectId}}/archive
 
-### Ukończ
-POST {{api}}/{{id}}/complete
-
-### Usuń
-DELETE {{api}}/{{id}}
+### Wyloguj
+POST {{api}}/auth/logout
