@@ -17,6 +17,28 @@ public class ProjectsController : ControllerBase
         this._service = service;
     }
 
+    [HttpPost("add-member")]
+    public async Task<ActionResult<ProjectResponse>> AddMember(ManipulateMemberRequest request)
+    {
+        Project? project = await _service.AddMember(User.GetUserId(), request.projectId, request.userId);
+        if (project is null)
+        {
+            return NotFound();
+        }
+        return Ok(ProjectResponse.From(project));
+    }
+
+    [HttpPost("remove-member")]
+    public async Task<IActionResult> RemoveMember(ManipulateMemberRequest request)
+    {
+        Project? project = await _service.RemoveMember(User.GetUserId(), request.projectId, request.userId);
+        if (project is null)
+        {
+            return NotFound();
+        }
+        return NoContent();
+    }
+
     [HttpGet]
     public async Task<IReadOnlyList<ProjectSummaryResponse>> GetAll()
     {

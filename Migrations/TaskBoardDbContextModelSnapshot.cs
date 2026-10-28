@@ -34,7 +34,30 @@ namespace TaskBoard.api.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("OwnerId")
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.ToTable("projects", (string)null);
+                });
+
+            modelBuilder.Entity("TaskBoard.Api.Domain.ProjectMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("Version")
@@ -43,9 +66,12 @@ namespace TaskBoard.api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId", "CreatedAt");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("projects", (string)null);
+                    b.HasIndex("ProjectId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("project_members", (string)null);
                 });
 
             modelBuilder.Entity("TaskBoard.Api.Domain.TaskItem", b =>
@@ -114,11 +140,17 @@ namespace TaskBoard.api.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("TaskBoard.Api.Domain.Project", b =>
+            modelBuilder.Entity("TaskBoard.Api.Domain.ProjectMember", b =>
                 {
+                    b.HasOne("TaskBoard.Api.Domain.Project", null)
+                        .WithMany("Members")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("TaskBoard.Api.Domain.User", null)
                         .WithMany()
-                        .HasForeignKey("OwnerId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -130,6 +162,11 @@ namespace TaskBoard.api.Migrations
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TaskBoard.Api.Domain.Project", b =>
+                {
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }

@@ -13,6 +13,7 @@ public class TaskBoardDbContext : DbContext
         
     }
 
+    public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<TaskItem> Tasks => Set<TaskItem>();
@@ -24,6 +25,17 @@ public class TaskBoardDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ProjectMember>(pm =>
+        {
+            pm.ToTable("project_members");
+            pm.HasKey(p => p.Id);
+            pm.HasOne<User>().WithMany().HasForeignKey(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
+            pm.Property(p => p.ProjectId);
+            pm.Property(p => p.IsOwner);
+            pm.Property<Guid>(VersionProperty).IsConcurrencyToken();
+
+            pm.HasIndex(p => new { p.ProjectId, p.UserId }).IsUnique();
+        });
         modelBuilder.Entity<User>(user =>
         {
             user.ToTable("users");
@@ -37,13 +49,13 @@ public class TaskBoardDbContext : DbContext
 
         modelBuilder.Entity<Project>(project =>
         {
-            project.ToTable("projects");
-            project.HasOne<User>().WithMany().HasForeignKey(p => p.OwnerId).OnDelete(DeleteBehavior.Cascade);
+            project.ToTable("projects");    
+            project.HasMany(p => p.Members).WithOne().HasForeignKey(p => p.ProjectId).OnDelete(DeleteBehavior.Cascade);
             project.HasKey(p => p.Id);
             project.Property(p => p.Name).HasMaxLength(Project.MaxNameLength).IsRequired();
             project.Property<Guid>(VersionProperty).IsConcurrencyToken();
 
-            project.HasIndex(p => new { p.OwnerId, p.CreatedAt });
+            project.HasIndex(p => new { p.CreatedAt });
         });
 
         modelBuilder.Entity<TaskItem>(task =>

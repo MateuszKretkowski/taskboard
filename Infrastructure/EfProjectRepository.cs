@@ -22,13 +22,12 @@ public class EfProjectRepository : IProjectRepository
 
     public async Task<Project?> GetByIdAsync(Guid id)
     {
-        var project = _db.Projects.FindAsync(id);
-        return await project;
+        return await _db.Projects.Include(p => p.Members).FirstOrDefaultAsync(p => p.Id == id);
     }
 
     public async Task<IReadOnlyList<ProjectSummary>> GetSummariesAsync(Guid ownerId)
     {
-        return await _db.Projects.Where(p => p.OwnerId == ownerId).OrderBy(p => p.CreatedAt).Select(p => new ProjectSummary(p.Id, p.Name, p.IsArchived, _db.Tasks.Where(t => t.ProjectId == p.Id && t.Status != TaskItemStatus.Done).Count(), _db.Tasks.Where(t => t.ProjectId == p.Id && t.Status == TaskItemStatus.Done).Count())).ToListAsync();
+        return await _db.Projects.Join(_db.ProjectMembers, p => p.Id, pm => pm.ProjectId, (p, pm) => new {p, pm}).Where(pm => pm.pm.UserId == ownerId).OrderBy(p => p.p.CreatedAt).Select(p => new ProjectSummary(p.p.Id, p.p.Name, p.p.IsArchived, _db.Tasks.Where(t => t.ProjectId == p.p.Id && t.Status != TaskItemStatus.Done).Count(), _db.Tasks.Where(t => t.ProjectId == p.p.Id && t.Status == TaskItemStatus.Done).Count())).ToListAsync();
     }
 
     public Task RemoveAsync(Project project)

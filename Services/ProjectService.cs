@@ -28,6 +28,30 @@ public class ProjectService
         return project;
     }
 
+    public async Task<Project?> AddMember(Guid ownerId, Guid id, Guid newMemberId)
+    {
+        Project? project = await _projects.GetByIdAsync(id);
+        if (project is null)
+        {
+            return null;
+        }
+        project.AddMember(ownerId, newMemberId);
+        await _projects.SaveChangesAsync();
+        return project;
+    }
+
+    public async Task<Project?> RemoveMember(Guid ownerId, Guid id, Guid newMemberId)
+    {
+        Project? project = await _projects.GetByIdAsync(id);
+        if (project is null)
+        {
+            return null;
+        }
+        project.RemoveMember(ownerId, newMemberId);
+        await _projects.SaveChangesAsync();
+        return project;
+    }
+
     public Task<Project?> RenameAsync(Guid ownerId, Guid id, string name) => ModifyAsync(ownerId, id, t =>
     {
         t.Rename(name);
@@ -35,12 +59,12 @@ public class ProjectService
 
     public Task<Project?> ArchiveAsync(Guid ownerId, Guid id) => ModifyAsync(ownerId, id, t =>
     {
-        t.Archive();
+        t.Archive(ownerId);
     });
 
     public Task<Project?> RestoreAsync(Guid ownerId, Guid id) => ModifyAsync(ownerId, id, t =>
     {
-        t.Restore();
+        t.Restore(ownerId);
     });
 
     public async Task<bool> DeleteAsync(Guid ownerId, Guid id)

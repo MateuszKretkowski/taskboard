@@ -21,7 +21,7 @@ public class AuthController : ControllerBase
     {
         this._service = service;
     }
-
+    
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
     {
