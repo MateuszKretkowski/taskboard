@@ -1,44 +1,49 @@
-import { useState } from "react";
-import type { TaskResponse } from "./api/types";
-import { Panel } from "./components/Panel";
-import { TaskList } from "./components/TaskList";
-import { sampleTasks } from "./data/sampleTasks";
-import { applyActionLocally, createTaskLocally } from "./data/localTasks";
-import type { TaskAction } from "./domain/taskActions";
-import { NewTaskForm } from "./components/NewTaskForm";
-import { StatusFilter, type StatusFilterValue } from "./components/StatusFilter";
+import { useEffect, useState } from "react";
+import type { CurrentUserResponse } from "./api/types";
+import { getCurrentUser, logout } from "./api/auth";
+import { LoginForm } from "./components/LoginForm";
+import { ProjectsPage } from "./pages/ProjectsPage";
 
 export function App() {
-  const [tasks, setTasks] = useState<TaskResponse[]>(sampleTasks);
-  const [filter, setFilter] = useState<StatusFilterValue>("All");
-  const visibleTasks = filter == "All" ? tasks : tasks.filter(t => t.status==filter);
-  const openCount = tasks.filter(t => t.status!=="Done").length;
+  const [session, setSession] = useState<Session>({ kind: 'checking' });
+  
+  useEffect(() => {
+    let ignore = false;
+    getCurrentUser().then(user => { if (!ignore) { setSession(user === null ? { kind: 'anonymous' } : { kind: 'authenticated', user }) } })
+      .catch(() => {
+        if (!ignore) {
+          setSession({ kind: 'anonymous' })
+        }
+      });
+      
+      return () => {
+        ignore = true;
+      }
+    }, [])
+    
+    
+  type Session = | { kind: 'checking' } | { kind: 'anonymous' } | { kind: 'authenticated'; user: CurrentUserResponse };
 
-  function handleAction(taskId: string, action: TaskAction) {
-    const now = new Date().toISOString();
-    setTasks(current => current.map(t => (t.id == taskId ? applyActionLocally(t, action, now) : t)));
-  }
-
-  function handleCreate(title: string) {
-    const curr = createTaskLocally(title, new Date().toISOString());
-    setTasks(current => [...current, curr]);
+  async function handleLogout() {
+    await logout();
+    setSession({ kind: 'anonymous' });
   }
 
   return (
     <div className="mx-auto max-w-3xl px-4 pt-6 pb-12">
       <header className="mb-6 flex items-center justify-between">
         <h1>TaskBoard</h1>
-        <span className="text-gray-500">Otwarte: {openCount}</span>
+        {session.kind === 'authenticated' && <span className="text-gray-500">{session.user.email}</span>}
+        <button onClick={handleLogout}>Wyloguj sie</button>
       </header>
 
-      <Panel title="Nowe zadanie">
-        <NewTaskForm onCreate={(title) => (handleCreate(title))} />
-      </Panel>
-
-      <Panel title="Zadania" >
-        <StatusFilter value={filter} onChange={(value: StatusFilterValue) => {setFilter(value)}} />
-        <TaskList tasks={visibleTasks} emptyText="Wszystko zrobione!" onAction={(taskId, action) => (handleAction(taskId, action))} />
-      </Panel>
+      {session.kind === 'checking' && <p>Sprawdzam sesje...</p>}
+      {session.kind === 'anonymous' && 
+        <LoginForm onLoggedIn={(user: CurrentUserResponse) => {setSession({ kind: 'authenticated', user: user })}} />
+      }
+      {session.kind === 'authenticated' && 
+        <ProjectsPage />
+      }
     </div>
   );
 }

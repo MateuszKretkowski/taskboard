@@ -1,0 +1,1 @@
+export type LoadState<T> = { kind: 'loading' } | { kind: 'error', message: string } | { kind: 'loaded', data: T };
