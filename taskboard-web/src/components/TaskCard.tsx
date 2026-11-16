@@ -6,10 +6,11 @@ import type { TaskAction } from "../domain/taskActions";
 
 type TaskCardProps = {
     task: TaskResponse,
+    busy: boolean,
     onAction: (taskId: string, action: TaskAction) => void
 }
 
-export function TaskCard({ task, onAction }: TaskCardProps) {
+export function TaskCard({ task, busy, onAction }: TaskCardProps) {
     return (
         <li className="rounded-lg border border-gray-200 bg-white px-3 py-2">
             <div className="flex items-center justify-between gap-3">
@@ -23,7 +24,7 @@ export function TaskCard({ task, onAction }: TaskCardProps) {
                     Utworzone: {formatDateTime(task.createdAt)}
                     {task.completedAt !== null && <> Ukonczone: {formatDateTime(task.completedAt)}</>}
                 </small>
-                <TaskActions status={task.status} onAction={(action) => (onAction(task.id, action))} />
+                <TaskActions status={task.status} disabled={busy} onAction={(action) => (onAction(task.id, action))} />
             </div>
         </li>
     );

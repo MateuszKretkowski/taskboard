@@ -5,14 +5,15 @@ import { allowedActions, actionLabels } from "../domain/taskActions";
 
 type TaskActionsProps = {
     status: TaskStatus,
+    disabled?: boolean,
     onAction: (action: TaskAction) => void
 };
 
-export function TaskActions({ status, onAction }: TaskActionsProps  ) {
+export function TaskActions({ status, disabled, onAction }: TaskActionsProps  ) {
     return(
         <div>
             {allowedActions(status).map(a => (
-                <button key={a} type="button" onClick={() => (onAction(a))}>{actionLabels[a]}</button>
+                <button key={a} type="button" disabled={disabled} onClick={() => (onAction(a))}>{actionLabels[a]}</button>
             ))}
         </div>
     );
