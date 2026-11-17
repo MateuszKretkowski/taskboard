@@ -26,7 +26,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     const response = await fetch(`/api${path}`, {
         method: options.method ?? 'GET',
         headers: options.body === undefined ? undefined : { 'Content-Type': 'application/json' },
-        body: options.signal === undefined ? undefined : JSON.stringify(options.body),
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
         signal: options.signal
     });
 

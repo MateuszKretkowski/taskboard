@@ -3,4 +3,4 @@ using TaskBoard.Api.Domain;
 
 namespace TaskBoard.Api.Contracts;
 
-public record RegisterUserRequest([Required] Email email, [Required] string password);
+public record RegisterUserRequest([Required] string email, [Required] string password);

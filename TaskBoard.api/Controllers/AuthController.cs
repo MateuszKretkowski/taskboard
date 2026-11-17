@@ -31,18 +31,26 @@ public class AuthController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost("register")]
-    public async Task<ActionResult<CurrentUserResponse>> Register(RegisterUserRequest request)
+    public async Task<ActionResult<CurrentUserResponse>> Register([FromBody] RegisterUserRequest request)
     {
-        var user = await _service.RegisterAsync(request.email.Value, request.password);
+        if (!Email.TryParse(request.email, out var email))
+        {
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Niepoprawny email");
+        }
+        var user = await _service.RegisterAsync(email!.Value, request.password);
         await SignInUserAsync(user);
         return CreatedAtAction(nameof(Me), new { user.Id }, CurrentUserResponse.From(user));
     }
 
     [AllowAnonymous]
     [HttpPost("login")]
-    public async Task<ActionResult<CurrentUserResponse>> Login(LoginUserRequest request)
+    public async Task<ActionResult<CurrentUserResponse>> Login([FromBody] LoginUserRequest request)
     {
-        var user = await _service.ValidateCredentialsAsync(request.email.Value, request.password);
+        if (!Email.TryParse(request.email, out var email))
+        {
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: "Niepoprawny email");
+        }
+        var user = await _service.ValidateCredentialsAsync(email!.Value, request.password);
         if (user is null)
         {
             return Problem(statusCode: StatusCodes.Status401Unauthorized, title: "Nieprawidlowy email lub haslo");

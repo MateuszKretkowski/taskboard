@@ -19,7 +19,7 @@ public record Email
 
     public static bool TryParse(string? value, out Email? email)
     {
-        if (Validate(value, out _) is not null)
+        if (Validate(value, out _) != null)
         {
             email = null;
             return false;
