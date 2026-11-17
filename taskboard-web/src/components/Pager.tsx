@@ -1,5 +1,3 @@
-import { TaskList } from "./TaskList";
-
 type PagerProps = {
     page: number,
     totalPages: number,
