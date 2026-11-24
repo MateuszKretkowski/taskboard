@@ -14,7 +14,7 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
             <select value={value} onChange={event => onChange(event.target.value as StatusFilterValue)}>
                 <option value="All">All</option>
                 <option value="Todo">Otwarte</option>
-                <option value="InProgess">Rozpoczete</option>
+                <option value="InProgress">Rozpoczete</option>
                 <option value="Done">Zakonczone</option>
             </select>
         </div>

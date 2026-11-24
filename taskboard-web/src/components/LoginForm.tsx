@@ -1,4 +1,4 @@
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { login, register } from "../api/auth";
 import { ErrorMessage } from "./ErrorMessage";
 import { readMessage } from "../api/client";

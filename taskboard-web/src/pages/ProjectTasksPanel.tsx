@@ -25,10 +25,10 @@ export function ProjectTasksPanel({ project, onTasksChanged }: ProjectTasksPanel
     const [filter, setFilter] = useState<StatusFilterValue>('All');
     const [page, setPage] = useState(1);
     const [reloadToken, setReloadToken] = useState(0);
-    const [busyTaskId, setBusyTaskId] = useState<string | null>('');
-    const [actionError, setActionError] = useState<string | null>('');
+    const [busyTaskId, setBusyTaskId] = useState<string | null>(null);
+    const [actionError, setActionError] = useState<string | null>(null);
 
-    const queryKey = `${project.projectId}|${filter}|${page}|${reloadToken}`
+    const queryKey = `${project.id}|${filter}|${page}|${reloadToken}`
 
     const pageSize = 5;
 
@@ -36,13 +36,15 @@ export function ProjectTasksPanel({ project, onTasksChanged }: ProjectTasksPanel
         const conrtoller = new AbortController();
         const status = filter === 'All' ? undefined : filter;
 
-        searchTasks(project.projectId, { status, page, pageSize }, conrtoller.signal)
+        searchTasks(project.id, { status, page, pageSize }, conrtoller.signal)
         .then(r => {
             setResult({ key: queryKey, state: { kind: 'loaded', data: r }});
         }).catch(error => {
             setResult({ key: queryKey, state: { kind: 'error', message: readMessage(error) } });
         })
-    }, [project.projectId, filter, page, queryKey]);
+
+        return () => conrtoller.abort();
+    }, [project.id, filter, page, queryKey]);
 
     const state: LoadState<PagedResponse<TaskResponse>> = result?.state ?? { kind: 'loading' };
     const refreshing = result !== null && result.key !== queryKey;
@@ -53,7 +55,7 @@ export function ProjectTasksPanel({ project, onTasksChanged }: ProjectTasksPanel
     }
 
     async function handleCreate(title: string) {
-        await createTask(project.projectId, title);
+        await createTask(project.id, title);
         setReloadToken(t => t + 1);
         onTasksChanged();
     }

@@ -14,7 +14,7 @@ export function ProjectList({ projects, selectedId, onSelect }: projectListProps
     return (
     <ul className="grid gap-2">
       {projects.map(project => (
-        <li key={project.projectId} className="rounded-lg border border-gray-200 bg-white px-3 py-2">
+        <li key={project.id} className="rounded-lg border border-gray-200 bg-white px-3 py-2">
           <div className="flex items-center justify-between gap-3">
             <span className="font-semibold">
               {project.name} 
@@ -22,8 +22,8 @@ export function ProjectList({ projects, selectedId, onSelect }: projectListProps
                 && 
                 <span className="rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-white bg-gray-500">Archiwum</span>}
             </span>
-            <button type="button" disabled={project.projectId === selectedId} onClick={() => onSelect(project.projectId)}>
-              {project.projectId === selectedId ? 'Otwarty' : 'Otwórz'}
+            <button type="button" disabled={project.id === selectedId} onClick={() => onSelect(project.id)}>
+              {project.id === selectedId ? 'Otwarty' : 'Otwórz'}
             </button>
           </div>
           <small>

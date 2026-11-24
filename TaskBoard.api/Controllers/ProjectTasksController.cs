@@ -6,7 +6,7 @@ using TaskBoard.Api.Domain;
 using TaskBoard.Api.Http;
 using TaskBoard.Api.Services;
 
-[Controller]
+[ApiController]
 [Route("api/projects/{id:guid}/tasks")]
 public class ProjectTasksController : ControllerBase
 {
@@ -29,13 +29,13 @@ public class ProjectTasksController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<TaskResponse>> Create(Guid id, [FromQuery] CreateProjectRequest request)
+    public async Task<ActionResult<TaskResponse>> Create(Guid id, CreateTaskRequest request)
     {
-        var task = await _service.CreateAsync(User.GetUserId(), id, request.name);
+        var task = await _service.CreateAsync(User.GetUserId(), id, request.Title);
         if (task is null)
         {
             return NotFound();
         }
-        return CreatedAtAction(nameof(TasksController.GetById), "Tasks", new { Id = task.Id }, task);
+        return CreatedAtAction(nameof(TasksController.GetById), "Tasks", new { Id = task.Id }, TaskResponse.From(task));
     }
 } 

@@ -17,7 +17,7 @@ export type ProjectResponse = {
 }
 
 export type ProjectSummaryResponse = {
-    projectId: string;
+    id: string;
     name: string;
     isArchived: boolean;
     openTaskCount: number;

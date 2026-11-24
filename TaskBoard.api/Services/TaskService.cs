@@ -33,7 +33,7 @@ public class TaskService
     public async Task<TaskItem?> CreateAsync(Guid userId, Guid projectId, string title)
     {
         var project = await GetOwnedProjectAsync(userId, projectId);
-        if (project is null || !project.IsOwnedBy(userId))
+        if (project is null)
         {
             return null;
         }
@@ -87,7 +87,7 @@ public class TaskService
     private async Task<Project?> GetOwnedProjectAsync(Guid userId, Guid id)
     {
         Project? project = await _projects.GetByIdAsync(id);
-        if (project is null || project.IsOwnedBy(userId))
+        if (project is null || !project.IsOwnedBy(userId))
         {
             return null;
         }

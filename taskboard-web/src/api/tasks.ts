@@ -13,13 +13,13 @@ export async function searchTasks(projectId: string, query: TaskQuery, signal?: 
     if (query.status !== undefined) {
         params.set('status', query.status);
     }
-    return await apiFetch<PagedResponse<TaskResponse>>(`projects/${projectId}/tasks?${params}`, { signal });
+    return await apiFetch<PagedResponse<TaskResponse>>(`/projects/${projectId}/tasks?${params}`, { signal });
 }
 
 export async function createTask(projectId: string, title: string): Promise<TaskResponse> {
-    return await apiFetch(`projects/${projectId}/tasks`, { method: 'POST', body: { title } });
+    return await apiFetch(`/projects/${projectId}/tasks`, { method: 'POST', body: { title } });
 }
 
 export async function applyTaskAction(taskId: string, action: TaskAction): Promise<TaskResponse> {
-    return await apiFetch(`tasks/${taskId}/${action}`, { method: 'POST' });
+    return await apiFetch(`/tasks/${taskId}/${action}`, { method: 'PUT' });
 }
