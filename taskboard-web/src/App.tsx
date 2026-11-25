@@ -3,6 +3,9 @@ import type { CurrentUserResponse } from "./api/types";
 import { getCurrentUser, logout } from "./api/auth";
 import { LoginForm } from "./components/LoginForm";
 import { ProjectsPage } from "./pages/ProjectsPage";
+import { Link, Navigate, Route, Routes } from "react-router";
+import { NotFoundPage } from "./pages/NotFoundPage";
+import { ProjectPage } from "./pages/ProjectPage";
 
 export function App() {
   const [session, setSession] = useState<Session>({ kind: 'checking' });
@@ -32,7 +35,7 @@ export function App() {
   return (
     <div className="mx-auto max-w-3xl px-4 pt-6 pb-12">
       <header className="mb-6 flex items-center justify-between">
-        <h1>TaskBoard</h1>
+        <Link to="/projects">TaskBoard</Link>
         {session.kind === 'authenticated' && <span className="text-gray-500">{session.user.email}</span>}
         <button onClick={handleLogout}>Wyloguj sie</button>
       </header>
@@ -42,7 +45,12 @@ export function App() {
         <LoginForm onLoggedIn={(user: CurrentUserResponse) => {setSession({ kind: 'authenticated', user: user })}} />
       }
       {session.kind === 'authenticated' && 
-        <ProjectsPage />
+      <Routes>
+        <Route path="/" element={<Navigate to="/projects" replace />} />
+        <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/projects/:projectId" element={<ProjectPage />} />
+        <Route path="/*" element={<NotFoundPage />} />
+      </Routes>
       }
     </div>
   );

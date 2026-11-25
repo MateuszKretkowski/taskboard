@@ -1,12 +1,11 @@
+import { Link } from "react-router";
 import type { ProjectSummaryResponse } from "../api/types";
 
 type projectListProps = {
     projects: ProjectSummaryResponse[],
-    selectedId: string | null,
-    onSelect: (id: string) => void
 }
 
-export function ProjectList({ projects, selectedId, onSelect }: projectListProps) {
+export function ProjectList({ projects }: projectListProps) {
     if (projects.length === 0) {
         return <p className="text-gray-500">Nie masz jeszcze projektów.</p>;
     }
@@ -22,9 +21,7 @@ export function ProjectList({ projects, selectedId, onSelect }: projectListProps
                 && 
                 <span className="rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-white bg-gray-500">Archiwum</span>}
             </span>
-            <button type="button" disabled={project.id === selectedId} onClick={() => onSelect(project.id)}>
-              {project.id === selectedId ? 'Otwarty' : 'Otwórz'}
-            </button>
+            <Link className="font-semibold" to={`/projects/${project.id}`}>{project.name}</Link>
           </div>
           <small>
             {project.openTaskCount} otwartych, {project.doneTaskCount} ukończonych

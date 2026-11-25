@@ -16,3 +16,7 @@ export async function archiveProject(id: string): Promise<ProjectResponse> {
 export async function restoreProject(id: string): Promise<ProjectResponse> {
     return await apiFetch<ProjectResponse>(`/projects/${id}/restore`, { method: 'POST' });
 }
+
+export async function getProject(id: string, signal?: AbortSignal): Promise<ProjectResponse> {
+    return await apiFetch<ProjectResponse>(`/projects/${id}`, { method: 'GET', signal });
+}
